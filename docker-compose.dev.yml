@@ -1,0 +1,60 @@
+# version: "3.9"
+
+# services:
+#   nodejs:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     image: node:latest
+#     container_name: webserver
+#     restart: unless-stopped
+#     environment:
+#       - MONGO_USERNAME=$MONGO_USERNAME
+#       - MONGO_PASSWORD=$MONGO_PASSWORD
+#       - MONGO_HOSTNAME=db
+#       - MONGO_PORT=$MONGO_PORT
+#       - MONGO_DB=$MONGO_DB
+#     ports:
+#       - "8082:8080"
+#     volumes:
+#       - ./webroot:/var/www
+#       - node_modules:/var/www/webroot/node_modules
+#     networks:
+#       - app-network
+#     command: ./wait-for.sh db:27017 -- /home/node/app/node_modules/.bin/nodemon app.js
+
+version: "3.9"
+
+services:
+    nodejs:
+        build:
+            dockerfile: Dockerfile
+            context: .
+        container_name: webserver
+        environment:
+            - MONGO_HOST=mongodb
+        ports:
+            - 8082:1337
+        volumes:
+            - ./webroot:/var/www
+            - /var/www/node_modules
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+
+    mongodb:
+        image: mongo:4
+        container_name: mongodb
+        # restart: always
+        # ports:
+        #   - 27017:27017
+        # environment:
+        #   - MONGO_INITDB_ROOT_USERNAME=root
+        #   - MONGO_INITDB_ROOT_PASSWORD=root
+        #   - MONGO_INITDB_DATABASE=onjiz_kg_db
+        networks:
+            - app-network
+
+networks:
+    app-network:
